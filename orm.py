@@ -6,9 +6,13 @@ Reference: https://www.sqlite.org/lang.html
 Author: Fernando Felix do Nascimento Junior
 License: MIT License
 Homepage: https://github.com/fernandojunior/python-sqlite-orm
+
+===============================================================================
+add Model.all, Model.get, Model.has Model.select_ids and Manager.select_ids
+https://github.com/mamahu/python-sqlite-orm
+===============================================================================
 '''
 import sqlite3
-
 
 #: Dictionary to map Python and SQLite data types
 DATA_TYPES = {str: 'TEXT', int: 'INTEGER', float: 'REAL'}
@@ -81,6 +85,13 @@ class Manager(object):
         self.type_check = type_check
         if not self._hastable():
             self.db.executescript(render_create_table_stmt(self.model))
+
+    def select_ids(self, field, value):
+        # result = self.db.execute('SELECT id FROM %s where ? = ?' % self.table_name)
+        # return (self.create(**row) for row in result.fetchall())
+        sql = 'SELECT id FROM %s where %s = ?' % (self.table_name, field)
+        result = self.db.execute(sql, value).fetchall()
+        return [r[0] for r in result]
 
     def all(self):
         result = self.db.execute('SELECT * FROM %s' % self.table_name)
@@ -170,3 +181,19 @@ class Model(object):
     @classmethod
     def manager(cls, db=None, type_check=True):
         return Manager(db if db else cls.db, cls, type_check)
+
+    @classmethod
+    def all(cls):
+        return cls.manager().all()
+
+    @classmethod
+    def get(cls, id):
+        return cls.manager().get(id)
+
+    @classmethod
+    def has(cls, id):
+        return cls.manager().has(id)
+
+    @classmethod
+    def select_ids(cls, field, value):
+        return cls.manager().select_ids(field, value)
