@@ -52,11 +52,14 @@ Following a basic tutorial to demonstrate how to use the ORM.
 5. Change the hello world post and update it in the database.
 
     ```py
-    >>> post = Post.manager().get(id=1)
+    >>> post = Post.get(id=1)
     >>> post.text = 'Hello Mundo'
     >>> post.update()
     >>> post.text
     Hello Mundo
+    
+    >>> Post.select_ids('text','Hello Mundo') # select id from Post where text="Hello Mundo"
+    [1]
     ```
 
 6. Commit all staged operations (`save` and `update`) to the database.
